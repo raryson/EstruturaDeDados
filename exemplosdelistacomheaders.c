@@ -1,3 +1,5 @@
+//Raryson Pereira Rost
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -24,6 +26,10 @@ struct headerLDE {
     struct nodod *fim;
 };
 
+int safeFflush(){
+	while(fgetc(stdin)!='\n');    
+}
+
 int criarHeaderLSE(struct headerLSE **lista){
     struct headerLSE *novo =NULL;
     novo = (struct headerLSE*) malloc(sizeof(struct headerLSE));
@@ -49,6 +55,7 @@ int criarHeaderLDE(struct headerLDE **lista){
     }
     *lista = novo;
 }
+
 int insereAEsquerdaLDEcomHeader(struct headerLDE **header, int dados){
     struct nodod *novo = NULL, *aux = NULL;
     
@@ -87,6 +94,22 @@ int insereAEsquerdaLDEcomHeader(struct headerLDE **header, int dados){
     }
 }
 
+int inserePrimeiroLDE(struct headerLSE **headerLSE, struct headerLDE **headerLDE){
+	
+	struct nodod *novo = NULL, *aux = NULL;
+	int valor = descobreMaiorValorLSE(headerLSE);
+	
+	aux = (*headerLDE)->inicio;
+	novo = (struct nodod *) malloc (sizeof(struct nodod));
+	novo->ant = NULL;
+	novo->dados = valor;
+	novo->prox = aux;
+	aux->ant = novo;
+	(*headerLDE)->inicio = novo;
+	(*headerLDE)->qtd++;
+	
+}
+
 int insereADireitaLSEcomHeaderLSE(struct headerLSE **header, int dados){
     struct nodo *novo = NULL, *aux = NULL;
     
@@ -116,7 +139,7 @@ int excluiLDE(struct headerLDE **header, int valor){
 	struct nodod *aux = NULL, *del = NULL;
 	int cont = 0;
 	if((*header)->inicio == NULL){
-		printf("LISTA VAZIA");
+		printf("LISTA VAZIA LDE");
 	}else{
 		aux = (*header)->inicio;
 		
@@ -194,7 +217,7 @@ int descobreMaiorValorLSE(struct headerLSE **header){
 	struct nodo *aux = NULL;
 	int maior = 0;
     if((*header)->inicio == NULL){
-        printf("\nLista em branco\n");
+        printf("\nLista em branco LSE\n");
     }else{
         aux = (*header)->inicio;
         while(aux->prox != NULL){
@@ -211,7 +234,7 @@ int imprimeLDEComHeader (struct headerLDE **header){
 	struct nodod *aux = NULL;
 	
     if((*header)->inicio == NULL){
-        printf("\nLista em branco\n");
+        printf("\nLista em branco LDE\n");
     }else{
         aux = (*header)->inicio;
         while(aux->prox != NULL){
@@ -219,6 +242,57 @@ int imprimeLDEComHeader (struct headerLDE **header){
             aux = aux->prox;
         }
     }
+	
+}
+
+int removeLista(struct headerLSE **headerLSE, struct headerLDE **headerLDE){
+	struct nodo *auxLS = NULL, *del = NULL;
+	struct nodod *auxLD = NULL, *delD = NULL;
+	int i;
+	
+	printf("\nDigite 1 para excluir a lista LSE ou 2 para excluir a LDE\n");
+	safeFflush();
+	scanf("d", &i);
+	if(i == 1){
+		auxLS = (*headerLSE)->inicio;
+		while(auxLS->prox != NULL){
+			del = auxLS;
+			auxLS = auxLS->prox;
+			free(del);
+			(*headerLSE)->qtd--;
+			(*headerLSE)->inicio = auxLS;
+		}
+		(*headerLSE)->fim = auxLS->prox;
+		(*headerLSE)->inicio = auxLS->prox;
+		(*headerLSE)->qtd--;
+		free(auxLS);
+		
+	}else{
+		auxLD = (*headerLDE)->inicio;
+		while(auxLD->prox != NULL){
+			delD = auxLD;
+			auxLD = auxLD->prox;
+			free(delD);
+			(*headerLDE)->qtd--;
+			(*headerLDE)->inicio = auxLD;
+		}
+		(*headerLDE)->fim = auxLD->prox;
+		(*headerLDE)->inicio = auxLD->prox;
+		(*headerLDE)->qtd--;
+		free(auxLD);
+	}
+	
+}
+
+int verificaQuantidadeLSE(struct headerLSE **headerLSE){
+	printf("\nA quantidade de nodos da LSE e: %d\n", (*headerLSE)->qtd );
+	return((*headerLSE)->qtd);
+	
+}
+
+int verificaQuantidadeLDE(struct headerLSE **headerLDE){
+	printf("\nA quantidade de nodos da LDE e: %d\n", (*headerLDE)->qtd );
+	return((*headerLDE)->qtd);
 	
 }
 
@@ -240,8 +314,10 @@ int main () {
     int tamanho, i;
     struct headerLSE * lista = NULL;
     struct headerLDE * listaD = NULL;
+    
     criarHeaderLSE(&lista);
     criarHeaderLDE(&listaD);
+    
     for(i = 0; i < 50; i++){
         insereADireitaLSEcomHeaderLSE(&lista, rand()%100);
        
@@ -250,22 +326,28 @@ int main () {
     for(i = 0; i < 50; i++){
     	insereAEsquerdaLDEcomHeader(&listaD, rand()%100);	
 	}
+	
     imprimeLSEComHeader(&lista);
     printf("\nFUNCIONOU LSE\n");
-    printf("Quantidade de itens na lista simplesmente encadeada com header: %d\n\n\n", lista->qtd);
+    verificaQuantidadeLSE(&lista);
     imprimeLDEComHeader(&listaD);
     printf("\nFUNCIONOU LDE\n");
-    printf("Quantidade de itens na lista duplamente encadeada com header: %d\n\n\n", listaD->qtd);
+    verificaQuantidadeLDE(&listaD);
     insereAntesDoMaiorLSE(&lista, 6666);
     imprimeLSEComHeader(&lista);
     printf("\nFUNCIONOU LSE DEPOIS DO MAIOR\n");
-    printf("Quantidade de itens na lista depois de acrescentar depois do maior %d\n\n\n", lista->qtd);
+    verificaQuantidadeLSE(&lista);
 	printf("Digite um numero para ser excluido da LDE\n");
 	scanf("%d", &i);
 	printf("\n\nO numero de itens excluidos foi: %d\n", excluiLDE(&listaD, i));	
     imprimeLDEComHeader(&listaD);
     printf("\nFUNCIONOU LDE\n");
-    printf("Quantidade de itens na lista duplamente encadeada com header: %d\n\n\n", listaD->qtd);
+    verificaQuantidadeLDE(&listaD);
+    inserePrimeiroLDE(&lista, &listaD);
+    imprimeLDEComHeader(&listaD);
+    removeLista(&lista, &listaD);
+    imprimeLDEComHeader(&listaD);
+    verificaQuantidadeLDE(&listaD);
     
     return(0);
 
