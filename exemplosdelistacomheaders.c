@@ -101,6 +101,7 @@ int insereADireitaLSEcomHeaderLSE(struct headerLSE **header, int dados){
         aux =  (*header)->inicio;
         while(aux->prox != NULL){
             aux = aux->prox;
+            
         }
         novo = (struct nodo *) malloc (sizeof(struct nodo));
         (*header)->fim = novo;
@@ -119,26 +120,47 @@ int excluiLDE(struct headerLDE **header, int valor){
 	}else{
 		aux = (*header)->inicio;
 		
+		if((*header)->inicio->dados == valor){
+			cont++;
+			del = aux;
+			aux = aux->prox;
+			aux->ant = NULL;
+			(*header)->qtd--;
+			(*header)->inicio = aux;
+			free(del);
+		}
+		if((*header)->fim->dados == valor){
+			cont++;
+			aux = (*header)->fim;
+			del = aux;
+			aux = aux->ant;
+			aux->prox = NULL;
+			(*header)->qtd--;
+			(*header)->fim = aux;
+			free(del);
+		}
+		
 		while(aux->prox != NULL){
-			
 			if(aux->dados == valor){
-				cont++;
-				del = aux;
-				aux = aux->prox;
-				del->ant->prox = aux;
-				aux->ant = del->ant;
-				free(del);
-			}else{
-				aux = aux->prox;
+					cont++;
+					del = aux;
+					aux = aux->prox;
+					del->ant->prox = aux;
+					aux->ant = del->ant;
+					(*header)->qtd--;
+					free(del);
+				}else{
+					aux = aux->prox;
+				}
+				
 			}
+			if(cont == 0){
+				printf("\nO numero buscado nao foi encontrado\n");
+			}
+			return(cont);
 			
 		}
-		if(cont == 0){
-			printf("\nO numero buscado nao foi encontrado\n");
-		}
-		return(cont);
 	}
-}
 
 int insereAntesDoMaiorLSE(struct headerLSE **header, int valor){
 	struct nodo *aux = NULL, *ant = NULL, *novo = NULL;
@@ -240,7 +262,7 @@ int main () {
     printf("Quantidade de itens na lista depois de acrescentar depois do maior %d\n\n\n", lista->qtd);
 	printf("Digite um numero para ser excluido da LDE\n");
 	scanf("%d", &i);
-	excluiLDE(&listaD, i);	
+	printf("\n\nO numero de itens excluidos foi: %d\n", excluiLDE(&listaD, i));	
     imprimeLDEComHeader(&listaD);
     printf("\nFUNCIONOU LDE\n");
     printf("Quantidade de itens na lista duplamente encadeada com header: %d\n\n\n", listaD->qtd);
